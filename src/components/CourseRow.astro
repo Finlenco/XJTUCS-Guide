@@ -13,6 +13,7 @@ const { code, name, credits, category, requirement = '', href } = Astro.props;
 
 <style>
   .course-row { min-height: 62px; display: grid; grid-template-columns: 130px minmax(180px, 1.35fr) minmax(150px, 1fr) 70px 24px; gap: 16px; align-items: center; padding: 9px 14px; border-top: 1px solid var(--line); transition: background 150ms var(--ease), padding-left 150ms var(--ease); }
+  .course-row[hidden] { display: none; }
   .course-row:hover { padding-left: 18px; background: var(--surface); }
   .course-row.unavailable { color: var(--muted); }
   .course-row.unavailable:hover { padding-left: 14px; background: transparent; }

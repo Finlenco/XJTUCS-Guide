@@ -4,4 +4,4 @@ type: assessment
 updated: 2026-07-17
 ---
 
-> 考核构成、题型与范围。请补充具体内容。
+![ICS考核](https://pub-e7c93c0b727d457c895b016a26707158.r2.dev/2026/07/IMG_20260725_220223.jpg)
