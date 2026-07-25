@@ -1,5 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { statSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ScrollSpy from '../../components/ScrollSpy.astro';
 import { withBase } from '../../lib/paths';
@@ -19,6 +22,24 @@ const typeLabel: Record<string, { zh: string; en: string }> = {
   'past-paper': { zh: '往年题', en: 'Past paper' },
 };
 const label = typeLabel[entry.data.type] ?? { zh: '资料', en: 'Resource' };
+
+// PDF 笔记：entry.data.pdf 为同目录下 PDF 文件名。
+// entry.id 形如 {课程}/{贡献者}/{文件名}，取目录部分拼出产物中的绝对路径。
+const RESOURCES_ROOT = fileURLToPath(new URL('../../content/resources/', import.meta.url));
+const pdfFile = entry.data.pdf;
+const pdfDirParts = entry.id.split('/').slice(0, -1);
+const pdfPath = pdfFile ? `/resources/${[...pdfDirParts, pdfFile].map(encodeURIComponent).join('/')}` : null;
+const pdfUrl = pdfPath ? withBase(pdfPath) : null;
+const pdfSize = (() => {
+  if (!pdfFile) return null;
+  try {
+    const bytes = statSync(join(RESOURCES_ROOT, ...pdfDirParts, pdfFile)).size;
+    return bytes > 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`;
+  } catch {
+    return null;
+  }
+})();
+const hasBody = Boolean(entry.body?.trim());
 ---
 <BaseLayout title={`${entry.data.title} | XJTUCS Guide`}>
   <div class="container article-layout">
@@ -33,7 +54,16 @@ const label = typeLabel[entry.data.type] ?? { zh: '资料', en: 'Resource' };
         <h1 class="serif">{entry.data.title}</h1>
         <dl><div><dt>作者</dt><dd>{entry.data.author}</dd></div><div><dt>更新时间</dt><dd>{entry.data.updated.toLocaleDateString('zh-CN')}</dd></div></dl>
       </header>
-      <div class="prose"><Content /></div>
+      {hasBody && <div class="prose"><Content /></div>}
+      {pdfUrl && (
+        <section class="pdf-mount">
+          <iframe class="pdf-frame" src={pdfUrl} title={entry.data.title} loading="lazy"></iframe>
+          <p class="pdf-fallback">
+            <a href={pdfUrl} target="_blank" rel="noopener">在新标签页打开</a>
+            {pdfSize && <><span aria-hidden="true">·</span><span>{pdfSize}</span></>}
+          </p>
+        </section>
+      )}
     </article>
     <aside class="meta"><p class="eyebrow">页面信息</p><p>发现内容有误或已经过时？</p><a href="https://github.com/XJTUCS-HUB/XJTUCS-Guide/issues">报告问题</a><hr /><small>本站为学生维护的非官方资料站。</small></aside>
   </div>
@@ -63,7 +93,7 @@ const label = typeLabel[entry.data.type] ?? { zh: '资料', en: 'Resource' };
   .prose :global(h3) { margin: 1.8em 0 .55em; font-size: 1.35rem; }
   .prose :global(p), .prose :global(li) { line-height: 1.85; }
   .prose :global(a) { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
-  .prose :global(img) { max-width: 100%; height: auto; margin: 24px auto; }
+  .prose :global(img) { display: block; max-width: 100%; height: auto; margin: 24px auto; }
   .prose :global(.katex-display) { margin: 1.4em 0; overflow-x: auto; overflow-y: hidden; padding-bottom: 6px; }
   .prose :global(.katex) { font-size: 1.02em; }
   .prose :global(pre) { max-width: 100%; overflow-x: auto; padding: 18px; border: 1px solid var(--line); background: var(--ink); color: var(--paper); font-size: .84rem; }
@@ -72,6 +102,11 @@ const label = typeLabel[entry.data.type] ?? { zh: '资料', en: 'Resource' };
   .prose :global(table) { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; }
   .prose :global(th), .prose :global(td) { padding: 8px 10px; border: 1px solid var(--line); text-align: left; }
   .prose :global(blockquote) { margin-inline: 0; padding: 8px 18px; border-left: 3px solid var(--brand); color: var(--muted); }
+  .pdf-mount { margin-top: 36px; }
+  .pdf-frame { width: 100%; height: 78vh; min-height: 520px; border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--surface); }
+  .pdf-fallback { margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--muted); font-size: .85rem; }
+  .pdf-fallback a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
+  .pdf-fallback span { color: var(--faint); }
   @media (max-width: 1050px) { .article-layout { grid-template-columns: minmax(0, 720px) 170px; justify-content: center; } .toc { display: none; } }
   @media (max-width: 760px) { .article-layout { grid-template-columns: 1fr; padding-top: 24px; } .meta { position: static; padding-top: 24px; border-top: 1px solid var(--line); } h1 { font-size: 2.8rem; } .prose { padding-top: 28px; } }
 </style>

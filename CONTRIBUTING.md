@@ -36,7 +36,14 @@ CI=true pnpm run build
 4. 正文只放自己原创或明确获得授权的内容。
 5. 图片优先使用稳定的 HTTPS 地址，不提交大体积附件。
 
-贡献者目录建议使用稳定的拼音或英文标识，例如 `WangEr`。具体写法可参考 [笔记编写指南](docs/templates/note-writing-guide.md)。
+贡献者目录建议使用稳定的拼音或英文标识，例如 `WangEr`。具体写法可参考 [笔记编写指南](docs/templates/note-writing-guide.md)。**目录名必须全小写**——Astro 会把目录名用作 URL 并自动小写，若源目录含大写字母，资源页路径与 PDF 等资产路径的大小写会不一致，部署到大小写敏感的服务器（如 Linux）时会 404。
+
+转载或无特定作者的公共往年资料（例如收集来的扫描试卷）统一放在 `public` 目录下，`author` 填 `Public`：
+
+```text
+src/content/resources/{课程代码小写}/public/往年题.pdf
+src/content/resources/{课程代码小写}/public/往年题.md
+```
 
 资料类型只能使用：`notes`、`experience`、`past-paper`。
 
@@ -115,7 +122,7 @@ updated: 2026-07-17
 src/content/courses/{课程代码小写}.md
 ```
 
-每门课程默认已建好这两份占位文件，**直接编辑现有文件填入正文即可**，无需新建。若课程尚未建目录，按上面的路径新建 `{类型}.md`。`course` 必须已经存在于 `src/content/courses/`。
+若课程尚未建文件，按上面的路径新建 `{课程代码小写}.md`，`code` 字段填写大写课程代码；已有文件直接编辑即可。
 
 Frontmatter 示例：
 
@@ -142,8 +149,11 @@ updated: 2026-07-11
 | `credits` | 否 | 学分，数字 |
 | `summary` | 是 | 课程页顶部简介 |
 | `updated` | 是 | 更新时间，格式 `YYYY-MM-DD` |
+| `draft` | 否 | 资料未整理完成时设为 `true`，课程在课程目录、首页与详情页中隐藏；整理完成后删除该字段或改回 `false` 即可恢复展示。默认 `false` |
 
 `updated` 按实际更新日期填写。这类内容直接在课程页内联渲染，不生成独立资源页，也不按贡献者分组；因此正文不要署个人作者，涉及转载时在文末注明来源与许可证。
+
+新增一门尚无 `resources` 的课程时，建议把 `draft` 设为 `true` 先在站点上隐藏，避免出现全占位的空课程页；待补齐笔记、学习体验或往年资料后再改回 `false` 上线。
 
 ### 新增课程资料
 
@@ -191,6 +201,7 @@ order: 10
 | `author` | 是 | 展示名；转载时填写原作者或来源 |
 | `updated` | 是 | 更新时间，格式 `YYYY-MM-DD` |
 | `order` | 否 | 同区块排序，数字越小越靠前；不填默认为 `999` |
+| `pdf` | 否 | 同目录下 PDF 文件名；填写后资源页正文区会内嵌该 PDF |
 
 #### 可用类型
 
@@ -203,6 +214,28 @@ order: 10
 | `past-paper` | 往年资料 | 往年题型、试题回忆、复习范围回忆 | `docs/templates/past-paper.md` |
 
 不要在 `resources` 里使用 `assessment`、`external`、`lab` 等类型。当前 schema 不接受这些类型。
+
+#### PDF 笔记
+
+如果想直接以 PDF 形式提交笔记或往年资料，把 PDF 与 md 放在同一贡献者目录，并在 frontmatter 加上 `pdf` 字段：
+
+```text
+src/content/resources/{课程代码小写}/{贡献者目录}/你的笔记.pdf
+src/content/resources/{课程代码小写}/{贡献者目录}/你的笔记.md
+```
+
+```yaml
+---
+title: 示例标题
+course: COMP000000
+type: notes
+author: 你的展示名
+updated: 2026-07-25
+pdf: 你的笔记.pdf
+---
+```
+
+页面会复用与 md 笔记一致的框架，正文区在简短说明之后内嵌 PDF 预览，并提供「在新标签页打开」兜底。PDF 会在构建时自动复制到产物，无需手动处理。往年试卷等扫描件同样适用：放在 `public` 目录下、`type` 用 `past-paper`、`author` 用 `Public` 即可。详见 [PDF 笔记模板](docs/templates/pdf-notes.md)。
 
 ## 内容要求
 

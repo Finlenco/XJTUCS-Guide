@@ -4,4 +4,5 @@ type: external
 updated: 2026-07-17
 ---
 
-> 教材、公开课、课程团队网站和相关仓库。请补充具体链接与说明。
+
+课程PPT和作业 [https://github.com/XJTUCS-HUB/Course_PPT/tree/main/courses/comp462205/slides](https://github.com/XJTUCS-HUB/Course_PPT/tree/main/courses/comp462205/slides)
