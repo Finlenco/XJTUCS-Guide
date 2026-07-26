@@ -1,6 +1,6 @@
 # 资料编写指南
 
-不同资料类型有对应的 Frontmatter 模板，写正文前先按类型选用：[笔记](course-resource.md)、[考核信息](assessment.md)、[往年资料](past-paper.md)、[课程学习体验](course-experience.md)。本指南的公式、图片、代码、交叉引用规则对所有类型都适用。课程介绍、考核信息、外部资源等课程级公共内容另见 [CONTRIBUTING.md](../../CONTRIBUTING.md)。
+不同资料类型有对应的 Frontmatter 模板，写正文前先按类型选用：[笔记](course-resource.md)、[往年资料](past-paper.md)、[课程学习体验](course-experience.md)。本指南的公式、图片、代码、交叉引用规则对所有类型都适用。课程介绍、考核信息、外部资源等课程级公共内容另见 [CONTRIBUTING.md](../../CONTRIBUTING.md)。
 
 ## 1. 目录结构
 
@@ -17,7 +17,7 @@ src/content/resources/comp400727/qijianfei/01-第0节-绪论.md
 ```
 
 - 第一层：课程代码，小写目录名，例如 `comp400727`
-- 第二层：贡献者目录，建议使用稳定的拼音或英文标识，例如 `WangEr`
+- 第二层：贡献者目录，建议使用稳定的拼音或英文标识，例如 `wanger`
 - 第三层：具体 Markdown 文件
 
 这里给出一个示例：

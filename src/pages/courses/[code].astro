@@ -6,7 +6,8 @@ import ScrollSpy from '../../components/ScrollSpy.astro';
 import { withBase } from '../../lib/paths';
 
 export async function getStaticPaths() {
-  const courses = await getCollection('courses');
+  // 跳过 draft 课程：不生成详情页，避免空占位页面被访问或收录。
+  const courses = (await getCollection('courses')).filter((c) => !c.data.draft);
   return courses.map((course) => ({ params: { code: course.id }, props: { course } }));
 }
 
@@ -162,6 +163,7 @@ function groupByContributor(items) {
   .inline-prose :global(h2) { margin: 1.8em 0 .6em; font-size: 1.4rem; }
   .inline-prose :global(h3) { margin: 1.6em 0 .5em; font-size: 1.15rem; }
   .inline-prose :global(p), .inline-prose :global(li) { line-height: 1.85; }
+  .inline-prose :global(img) { display: block; max-width: 100%; height: auto; margin: 24px auto; }
   .inline-prose :global(a) { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
   .inline-prose :global(ul), .inline-prose :global(ol) { padding-left: 1.4em; }
   .inline-prose :global(blockquote) { margin-inline: 0; padding: 6px 18px; border-left: 3px solid var(--brand); color: var(--muted); }

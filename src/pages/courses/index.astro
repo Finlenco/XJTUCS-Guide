@@ -19,7 +19,8 @@ const categoryId = (category: string) => {
   const asciiSlug = category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   return categoryIds.get(category) ?? `category-${asciiSlug || encodeURIComponent(category)}`;
 };
-const courses = (await getCollection('courses')).sort((a, b) =>
+// draft 课程（资料未整理完成）不在目录中展示。
+const courses = (await getCollection('courses')).filter((c) => !c.data.draft).sort((a, b) =>
   categoryRank(a.data.category) - categoryRank(b.data.category) ||
   a.data.category.localeCompare(b.data.category, 'zh-CN') ||
   a.data.code.localeCompare(b.data.code, 'zh-CN')
