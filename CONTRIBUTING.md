@@ -25,8 +25,12 @@ pnpm run dev
 提交前运行：
 
 ```bash
-CI=true pnpm run build
+pnpm run policy:test
+pnpm run policy:check
+pnpm run check
 ```
+
+Pull Request 会由 Danger.js 自动检查目录、Frontmatter、课程引用和 PDF 配对。检查结果、常见修复方法和仓库 Owner 的启用步骤见 [Danger.js PR 审查使用与设置](docs/danger-review.md)。
 
 ## 新增课程资料
 
