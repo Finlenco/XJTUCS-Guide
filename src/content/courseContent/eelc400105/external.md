@@ -1,7 +1,7 @@
 ---
 course: EELC400105
 type: external
-updated: 2026-07-17
+updated: 2026-07-25
 ---
 
-> 教材、公开课、课程团队网站和相关仓库。请补充具体链接与说明。
+PPT与随堂测验解答 [https://github.com/XJTUCS-HUB/Course_PPT/tree/main/courses/eelc400105/slides](https://github.com/XJTUCS-HUB/Course_PPT/tree/main/courses/eelc400105/slides)

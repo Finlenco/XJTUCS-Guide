@@ -3,7 +3,9 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CourseRow from '../components/CourseRow.astro';
 import { withBase } from '../lib/paths';
+// draft 课程（资料未整理完成）不在首页展示。
 const courses = (await getCollection('courses'))
+  .filter((c) => !c.data.draft)
   .sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime() || a.data.code.localeCompare(b.data.code, 'zh-CN'))
   .slice(0, 5);
 const courseHref = (id: string) => withBase(`/courses/${id}/`);
@@ -20,9 +22,9 @@ const creditsLabel = (credits?: number) => credits ?? '待核对';
       </div>
       <aside class="course-map" aria-label="课程方向">
         <div class="map-head"><span>课程索引</span><small>按培养方案分类</small></div>
-        <a href={withBase('/courses/')}><strong>01</strong><span>专业基础</span><small>离散数学 · 程序设计 · 数据结构</small></a>
-        <a href={withBase('/courses/')}><strong>02</strong><span>专业核心</span><small>组成 · 系统 · 编译 · 网络</small></a>
-        <a href={withBase('/courses/')}><strong>03</strong><span>专业选修</span><small>软件理论 · 系统结构 · AI · 网络</small></a>
+        <a href={withBase('/courses/')}><strong>01</strong><span>专业基础</span></a>
+        <a href={withBase('/courses/')}><strong>02</strong><span>专业核心</span></a>
+        <a href={withBase('/courses/')}><strong>03</strong><span>专业选修</span></a>
       </aside>
     </div>
   </section>
@@ -30,22 +32,22 @@ const creditsLabel = (credits?: number) => credits ?? '待核对';
   <section class="courses-section container">
     <div class="section-heading">
       <div><p class="eyebrow">Course catalog</p><h2 class="serif">从课程开始</h2></div>
-      <p>先找到课程，再查看与教师、学期相关的资料上下文。</p>
     </div>
     <div class="filters" aria-label="课程筛选">
-      <button class="active">全部</button><button>专业基础</button><button>专业核心</button><button>专业选修</button>
+      <button class="active" data-filter="all">全部</button><button data-filter="专业基础">专业基础</button><button data-filter="专业核心">专业核心</button><button data-filter="专业选修">专业选修</button>
       <a href={withBase('/courses/')}>查看完整目录 →</a>
     </div>
     <div class="course-list">
       {courses.map((course) => <CourseRow code={course.data.code} name={course.data.name} credits={creditsLabel(course.data.credits)} category={course.data.category} requirement={course.data.requirement} href={courseHref(course.id)} />)}
     </div>
+    <p class="no-results" hidden>本页暂未展示该分类课程，可查看<a href={withBase('/courses/')}>完整目录</a>。</p>
   </section>
 
   <section class="updates-band">
     <div class="container updates-grid">
       <div><p class="eyebrow">Recently updated</p><h2 class="serif">最近整理</h2></div>
       <ol>
-        <li><time>待填充</time><a href={withBase('/courses/comp450205/')}>首批课程内容整理中</a><span>课程资料</span></li>
+        <li><time>待填充</time><a href={withBase('/courses/comp400727/')}>ICS课程资料已上线</a><span>课程资料</span></li>
         <li><time>待填充</time><a href={withBase('/contribute/')}>贡献方式与内容边界</a><span>项目说明</span></li>
       </ol>
     </div>
@@ -76,6 +78,8 @@ const creditsLabel = (credits?: number) => credits ?? '待核对';
   .filters button { min-height: 36px; padding: 0 12px; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
   .filters button:hover, .filters button.active { background: var(--ink); color: var(--paper); }
   .filters a { margin-left: auto; color: var(--link); font-size: .82rem; }
+  .no-results { margin: 32px 0 0; padding: 24px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+  .no-results a { color: var(--link); }
   .updates-band { padding-block: 72px; border-block: 1px solid var(--line); background: var(--surface); }
   .updates-grid { display: grid; grid-template-columns: .72fr 1.28fr; gap: 80px; }
   .updates-grid ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
@@ -89,3 +93,25 @@ const creditsLabel = (credits?: number) => credits ?? '待核对';
   @media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; } .hero { min-height: 0; } .course-map { display: none; } .updates-grid { grid-template-columns: 1fr; gap: 32px; } h1 { font-size: 4.4rem; } }
   @media (max-width: 680px) { .hero-grid { padding-block: 56px; } h1 { font-size: 3.15rem; } .section-heading { grid-template-columns: 1fr; gap: 14px; } .section-heading > p { justify-self: auto; } .filters { overflow-x: auto; } .filters button { white-space: nowrap; } .filters a { display: none; } :global(html[data-variant="notes"]) .course-list { grid-template-columns: 1fr; } .updates-grid li { grid-template-columns: 1fr auto; padding-block: 12px; } .updates-grid time { grid-column: 1 / 3; } }
 </style>
+
+<script>
+  const filters = [...document.querySelectorAll<HTMLButtonElement>('.filters button')];
+  const rows = [...document.querySelectorAll<HTMLElement>('[data-course-row]')];
+  const empty = document.querySelector<HTMLElement>('.no-results');
+  const filterCourses = (value: string) => {
+    let visible = 0;
+    rows.forEach((row) => {
+      const match = value === 'all' || row.dataset.category === value;
+      row.hidden = !match;
+      if (match) visible++;
+    });
+    if (empty) empty.hidden = visible !== 0;
+  };
+  filters.forEach((button) => {
+    button.addEventListener('click', () => {
+      filters.forEach((b) => b.classList.remove('active'));
+      button.classList.add('active');
+      filterCourses(button.dataset.filter ?? 'all');
+    });
+  });
+</script>
