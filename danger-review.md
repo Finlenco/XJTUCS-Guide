@@ -36,11 +36,13 @@ pnpm run check
 Danger 输出分为两种：
 
 - `FAIL`：会阻止合并，必须修复。
-- `WARN`：建议处理，但不会让工作流失败。
+- `WARN`：不会阻止合并；请尽量修复，无法或无需修复时可在 PR 中说明原因。
 
-修复后继续 push 到同一个 PR 即可。Danger 会更新原有评论，不需要关闭并重开 PR。
+收到 `FAIL` 或 `WARN` 后，直接修改原分支并继续 push 到同一个 PR 即可。不要为修复检查结果关闭或重新创建 PR。
 
-### 爆阻断错误的问题参考
+新提交会触发 `PR Policy / danger` 重新运行，并更新原有 Danger 评论。评论更新不是实时的：工作流仍在运行时，或 GitHub 页面没有自动刷新时，可能暂时看到旧结果。请先等待 PR 页面 Checks 区域中的 `PR Policy / danger` 运行完成，再刷新页面查看。合并是否被阻止以 Required Check `Build / build` 的最终状态为准。
+
+### 常见阻断错误
 
 - 课程文件不是 `src/content/courses/{课程代码小写}.md`。
 - 课程代码、目录名和 Frontmatter 不一致。
@@ -79,70 +81,13 @@ pdf: 离散数学笔记.pdf
 
 不要填写 `./离散数学笔记.pdf`、子目录或大小写不同的名称。
 
-## For Repo owner：首次启用
+## 仓库管理员
 
-### 1. 合并本地实现
+管理员审批、自有 PR 的处理方式、双 Ruleset 构造及日常运维见：
 
-`pull_request_target` 工作流使用默认分支中的工作流和 Dangerfile。因此，新增 Danger 的这次 PR 本身不会使用尚未合并的新版规则；合并后，后续 PR 才会正常触发。
+- [PR 审查与 Ruleset 管理指南](docs/maintainers/pr-rulesets.md)
 
-需要合并的关键文件包括：
-
-```text
-dangerfile.js
-scripts/pr-policy/
-.github/workflows/danger.yml
-.github/workflows/build.yml
-package.json
-pnpm-lock.yaml
-```
-
-### 2. 检查 Actions 权限
-
-在仓库的 `Settings → Actions → General` 中确认组织或仓库策略没有禁止工作流申请 PR 写权限。工作流已经使用最小权限：
-
-```yaml
-permissions:
-  contents: read
-  pull-requests: write
-```
-
-不需要创建 Personal Access Token，不需要创建专用机器人账号，也不要把 PAT 添加到 fork PR 可访问的环境。
-
-如果组织策略禁止 `pull-requests: write`，Danger 仍可作为只读检查运行，但不能发布评论；这时需要由组织管理员放开上述单项权限。
-
-### 3. 配置 Ruleset 或分支保护
-
-先让合并后的工作流至少成功运行一次，然后在 `Settings → Rules → Rulesets` 或 `Branches` 中保护 `main`，将以下检查设为 Required：
-
-```text
-Build / build
-PR Policy / danger
-```
-
-不要随意更改 workflow 或 job 名称，否则 GitHub 会把它视为新的状态检查，需要重新选择。
-
-建议同时要求：
-
-- 合并前必须通过 Pull Request。
-- 至少一名维护者批准。
-- 对 `.github/workflows/`、`dangerfile.js` 和 `scripts/pr-policy/` 使用 CODEOWNERS。
-
-CODEOWNERS 必须填写实际维护者或团队，例如：
-
-```text
-/.github/workflows/  @你的组织/维护团队
-/dangerfile.js       @你的组织/维护团队
-/scripts/pr-policy/  @你的组织/维护团队
-```
-
-### 4. 验证同仓库与 fork PR
-
-分别建立两个测试 PR：
-
-1. 正常内容 PR，确认两个检查都通过且 Danger 留下通过消息。
-2. 使用大写贡献者目录或错误 Frontmatter 的 fork PR，确认 Danger 能评论且两个检查阻止合并。
-
-测试完成后再把状态检查设为必需，可以避免错误配置直接锁住 `main`。
+当前合并门禁以 `Build / build` 为准，`PR Policy / danger` 负责生成易读的 PR 评论，不应将 Danger 评论本身当作 GitHub Approval。
 
 ## 安全边界
 
