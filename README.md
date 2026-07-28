@@ -6,7 +6,7 @@
 
 课程 PPT 请前往附属仓库：[XJTUCS Course PPT](https://github.com/XJTUCS-HUB/Course_PPT)。
 
-> (20260727凌晨更新) Pull Request 内容格式检查bot上线，请[关注公告](../XJTUCS-Guide/docs/announcements/danger-bot-launch.md)，[for developers](../XJTUCS-Guide/docs/maintainers/pr-rulesets.md)。
+> (20260727凌晨更新) Pull Request 内容格式检查bot上线，请[关注公告](../main/docs/announcements/danger-bot-launch.md)，[for developers](../main/docs/maintainers/pr-rulesets.md)。
 
 ## 该项目的初衷
 
