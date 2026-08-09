@@ -2,7 +2,7 @@
 title: 2025春平时作业
 course: COMP000327
 type: past-paper
-author: public
+author: Public
 updated: 2026-08-09
 order: 20
 ---
@@ -128,6 +128,30 @@ Submission Guidelines
 > 已附加文件:
 >     文件 第九次作业.png (378.66 KB)
 
-![第九次作业.png](assets/第九次作业.png)
+1. 证明极大对数似然估计中目标函数的等价性
+
+$$
+\ell(w,b)=\sum_{i=1}^{m}\ln p(y_i|x_i;w,b)\iff\ell(\beta)=\sum_{i=1}^{m}\left(-y_i\beta^T\hat{x}_i+\ln(1+e^{\beta^T\hat{x}_i})\right)
+$$
+
+2. F1 值与 BEP 值关系分析
+
+    若学习器 A 的 F1 值比学习器 B 高，试分析 A 的 BEP 值是否也比 B 高？举例说明。
+
+
+3. 分层抽样划分方式计算
+
+    某数据集包含 **1200 个样本**，三个类别：
+
+    - A 类：500 个样本
+    - B 类：400 个样本
+    - C 类：300 个样本
+
+    现需使用**留出法（分层抽样）**将其划分为：
+
+    - 训练集：80%
+    - 测试集：20%
+
+    试计算满足条件的划分方式共有多少种？
 
 完成第九次作业内容，整合为一个文档提交。 
