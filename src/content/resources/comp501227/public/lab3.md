@@ -4,6 +4,6 @@ course: COMP501227
 type: past-paper
 author: Public
 updated: 2026-08-08
-order: 10
+order: 30
 pdf: lab3.pdf
 ---
